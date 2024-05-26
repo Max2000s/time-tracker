@@ -20,10 +20,6 @@ fn display_tasks(tasks: &[Task]) {
         } else {
             Duration::seconds(0)
         };
-
-        let last_entry = task.history.last().map_or("N/A".to_string(), |entry| {
-            format!("{} - {}", entry.start, entry.end)
-        });
         let total_duration = task
             .history
             .iter()

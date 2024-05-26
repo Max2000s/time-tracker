@@ -1,3 +1,4 @@
+use crate::models::time_entry::TimeEntry;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -8,10 +9,4 @@ pub struct Task {
     pub active: bool,
     pub start_time: Option<DateTime<Utc>>,
     pub history: Vec<TimeEntry>,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct TimeEntry {
-    pub start: DateTime<Utc>,
-    pub end: DateTime<Utc>,
 }

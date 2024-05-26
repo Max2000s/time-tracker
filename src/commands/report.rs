@@ -1,5 +1,6 @@
-use crate::models::task::{Task, TimeEntry};
-use crate::persistence::file_storage::load_tasks;
+use crate::{
+    models::task::Task, models::time_entry::TimeEntry, persistence::file_storage::load_tasks,
+};
 use chrono::{Datelike, Duration, Utc};
 use prettytable::{cell, row, Table};
 use std::fs::File;

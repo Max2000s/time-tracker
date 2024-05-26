@@ -1,6 +1,6 @@
 // src/commands/stop.rs
 use crate::{
-    models::task::TimeEntry,
+    models::time_entry::TimeEntry,
     persistence::file_storage::{load_tasks, save_task},
 };
 use chrono::Utc;
