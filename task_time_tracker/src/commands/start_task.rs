@@ -1,15 +1,43 @@
 use crate::models::task::Task;
-use crate::persistence::file_storage::save_task;
+use crate::persistence::file_storage::{load_tasks, save_tasks};
 use chrono::Utc;
 
 pub fn execute(task_name: &str) {
+    let mut tasks = load_tasks();
+
+    if let Some(task) = find_task_by_name(&mut tasks, task_name) {
+        print!("{:?}", task);
+        if task.active == false {
+            update_existing_task(task);
+            println!("Started inactive existing task: {}", task_name);
+        } else {
+            println!("The task {} is already running.", task_name);
+            // dialog for resetting the time would be possible
+        }
+    } else {
+        create_new_task(&mut tasks, task_name);
+        println!("Started new task: {}", task_name);
+    }
+
+    save_tasks(&tasks).unwrap();
+}
+
+fn find_task_by_name<'a>(tasks: &'a mut Vec<Task>, task_name: &str) -> Option<&'a mut Task> {
+    tasks.iter_mut().find(|task| task.name == task_name)
+}
+
+fn update_existing_task(task: &mut Task) {
+    task.start_time = Some(Utc::now());
+    task.active = true;
+}
+
+fn create_new_task(tasks: &mut Vec<Task>, task_name: &str) {
     let task = Task {
-        id: 1,
+        id: tasks.len() as u32 + 1,
         name: task_name.to_string(),
+        active: true,
         start_time: Some(Utc::now()),
-        accumulated_time: chrono::Duration::seconds(0),
         history: Vec::new(),
     };
-    save_task(&task);
-    println!("Started task: {}", task_name);
+    tasks.push(task);
 }
