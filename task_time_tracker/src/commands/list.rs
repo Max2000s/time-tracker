@@ -10,13 +10,7 @@ pub fn execute() {
 
 fn display_tasks(tasks: &[Task]) {
     let mut table = Table::new();
-    table.add_row(row![
-        "Name",
-        "Active",
-        "Current Duration",
-        "Last Entry",
-        "Total Duration"
-    ]);
+    table.add_row(row!["Name", "Active", "Current Duration", "Total Duration"]);
 
     for task in tasks {
         let current_duration = if task.active {
@@ -41,7 +35,6 @@ fn display_tasks(tasks: &[Task]) {
             task.name,
             if task.active { "Yes" } else { "--" },
             format_duration(current_duration),
-            last_entry,
             format_duration(total_duration),
         ]);
     }
