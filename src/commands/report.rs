@@ -1,7 +1,7 @@
 use crate::{
     models::task::Task, models::time_entry::TimeEntry, persistence::file_storage::load_tasks,
 };
-use chrono::{Datelike, Duration, Utc};
+use chrono::{Date, DateTime, Datelike, Duration, Utc};
 use prettytable::{cell, row, Table};
 use std::fs::File;
 use std::io::Write;
@@ -22,23 +22,9 @@ fn generate_report(tasks: &[Task], period: &str) -> Vec<(String, Duration)> {
         .iter()
         .map(|task| {
             let filtered_history: Vec<&TimeEntry> = match period {
-                "day" => task
-                    .history
-                    .iter()
-                    .filter(|entry| entry.start.date_naive() == now.date_naive())
-                    .collect(),
-                "week" => task
-                    .history
-                    .iter()
-                    .filter(|entry| now.signed_duration_since(entry.start).num_weeks() == 0)
-                    .collect(),
-                "month" => task
-                    .history
-                    .iter()
-                    .filter(|entry| {
-                        entry.start.month() == now.month() && entry.start.year() == now.year()
-                    })
-                    .collect(),
+                "day" => get_daily_report(task, now),
+                "week" => get_weekly_report(task, now),
+                "month" => get_monthly_report(task, now),
                 _ => task.history.iter().collect(),
             };
             let total_duration = filtered_history
@@ -48,6 +34,27 @@ fn generate_report(tasks: &[Task], period: &str) -> Vec<(String, Duration)> {
                 });
             (task.name.clone(), total_duration)
         })
+        .collect()
+}
+
+fn get_daily_report(task: &Task, date: DateTime<Utc>) -> Vec<&TimeEntry> {
+    task.history
+        .iter()
+        .filter(|entry| entry.start.date_naive() == date.date_naive())
+        .collect()
+}
+
+fn get_weekly_report(task: &Task, date: DateTime<Utc>) -> Vec<&TimeEntry> {
+    task.history
+        .iter()
+        .filter(|entry| date.signed_duration_since(entry.start).num_weeks() == 0)
+        .collect()
+}
+
+fn get_monthly_report(task: &Task, date: DateTime<Utc>) -> Vec<&TimeEntry> {
+    task.history
+        .iter()
+        .filter(|entry| entry.start.month() == date.month() && entry.start.year() == date.year())
         .collect()
 }
 
